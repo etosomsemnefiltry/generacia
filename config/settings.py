@@ -20,8 +20,8 @@ env = environ.Env(
     DJANGO_SECRET_KEY=(str, "change-me"),
     DJANGO_ALLOWED_HOSTS=(str, ""),
     DJANGO_CORS_ORIGINS=(str, ""),
-    DJANGO_DATABASE_URL=(str, f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
-    DJANGO_STATIC_BACKEND=(str, "local"),  # local | whitenoise
+    DJANGO_DATABASE_URL=(str,),  # теперь обязательно указывать
+    DJANGO_STATIC_BACKEND=(str, "local"),
     DJANGO_CSRF_TRUSTED_ORIGINS=(str, ""),
 )
 environ.Env.read_env(BASE_DIR / ".env")
