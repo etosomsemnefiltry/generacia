@@ -31,7 +31,15 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [h.strip() for h in env("DJANGO_ALLOWED_HOSTS").split(",") if h.strip()]
 
 # DB
-DATABASES = {"default": dj_database_url.parse(env("DJANGO_DATABASE_URL"))}
+DATABASES = {
+    "default": dj_database_url.config(
+        env="DATABASE_URL",
+        default="postgres://appuser:strong_password@127.0.0.1:5432/appdb",
+        conn_max_age=600,
+        ssl_require=env("DB_SSL_REQUIRE", default="0") == "1",
+    )
+}
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 INSTALLED_APPS = [
     "jazzmin", # admin panel
@@ -81,14 +89,6 @@ else:
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 
-# SQLite на старте
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
 # DRF (минимум)
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -111,6 +111,23 @@ SIMPLE_JWT = {
 # CORS/CSRF для отдельного фронта
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [o.strip() for o in env("DJANGO_CORS_ORIGINS").split(",") if o.strip()]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'GET',        # чтение данных
+    'POST',       # создание (если нужно)
+    'OPTIONS',    # обязателен для CORS
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in env("DJANGO_CSRF_TRUSTED_ORIGINS").split(",") if o.strip()]
 
 
