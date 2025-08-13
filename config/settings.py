@@ -73,11 +73,12 @@ if STATIC_BACKEND == "whitenoise":
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 else:
     MIDDLEWARE = [
         "corsheaders.middleware.CorsMiddleware",
         "django.middleware.security.SecurityMiddleware",
+        
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
