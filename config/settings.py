@@ -12,23 +12,26 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import environ
-import dj_database_url 
+import dj_database_url
+from dotenv import load_dotenv
+import os 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-env = environ.Env(
-    DJANGO_DEBUG=(bool, False),
-    DJANGO_SECRET_KEY=(str, "change-me"),
-    DJANGO_ALLOWED_HOSTS=(str, ""),
-    DJANGO_CORS_ORIGINS=(str, ""),
-    DJANGO_DATABASE_URL=(str,),  # теперь обязательно указывать
-    DJANGO_STATIC_BACKEND=(str, "local"),
-    DJANGO_CSRF_TRUSTED_ORIGINS=(str, ""),
-)
-environ.Env.read_env(BASE_DIR / ".env")
+load_dotenv()
 
-DEBUG = env("DJANGO_DEBUG")
-SECRET_KEY = env("DJANGO_SECRET_KEY")
-ALLOWED_HOSTS = [h.strip() for h in env("DJANGO_ALLOWED_HOSTS").split(",") if h.strip()]
+# Простой подход через DJANGO_DEBUG
+debug_value = os.environ.get('DJANGO_DEBUG')
+if debug_value and debug_value.lower() in ('1', 'true', 'yes', 'on'):
+    DEBUG = True
+else:
+    DEBUG = False
+
+if DEBUG:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+    SECRET_KEY = "dev-secret-key-change-in-production"
+else:
+    ALLOWED_HOSTS = ['gir.generacia.energy']
+    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-in-production')
 
 # DB
 DATABASES = {
@@ -36,7 +39,7 @@ DATABASES = {
         env="DATABASE_URL",
         default="postgres://appuser:strong_password@127.0.0.1:5432/appdb",
         conn_max_age=600,
-        ssl_require=env("DB_SSL_REQUIRE", default="0") == "1",
+        ssl_require=os.environ.get("DB_SSL_REQUIRE", "0") == "1",
     )
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
@@ -60,12 +63,23 @@ INSTALLED_APPS = [
 ]
 AUTH_USER_MODEL = "gir.User"
 
-STATIC_BACKEND = env("DJANGO_STATIC_BACKEND")
-if STATIC_BACKEND == "whitenoise":
+# Простой подход через DEBUG
+if DEBUG:
     MIDDLEWARE = [
         "corsheaders.middleware.CorsMiddleware",
         "django.middleware.security.SecurityMiddleware",
-        "whitenoise.middleware.WhiteNoiseMiddleware",  # важно: до CommonMiddleware
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    ]
+else:
+    MIDDLEWARE = [
+        "corsheaders.middleware.CorsMiddleware",
+        "django.middleware.security.SecurityMiddleware",
+        "whitenoise.middleware.WhiteNoiseMiddleware",  # только для продакшена
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
@@ -74,18 +88,6 @@ if STATIC_BACKEND == "whitenoise":
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
     STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
-else:
-    MIDDLEWARE = [
-        "corsheaders.middleware.CorsMiddleware",
-        "django.middleware.security.SecurityMiddleware",
-        
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.common.CommonMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.messages.middleware.MessageMiddleware",
-        "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    ]
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
@@ -109,9 +111,14 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-# CORS/CSRF для отдельного фронта
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [o.strip() for o in env("DJANGO_CORS_ORIGINS").split(",") if o.strip()]
+# CORS/CSRF настройки
+if DEBUG:
+    CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
+    CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+else:
+    CORS_ALLOWED_ORIGINS = ['https://gir.generacia.energy']
+    CSRF_TRUSTED_ORIGINS = ['https://gir.generacia.energy']
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'GET',        # чтение данных
@@ -129,7 +136,6 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
-CSRF_TRUSTED_ORIGINS = [o.strip() for o in env("DJANGO_CSRF_TRUSTED_ORIGINS").split(",") if o.strip()]
 
 
 
@@ -166,12 +172,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 # Static/Media (разная раздача в dev/prod)
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 STATICFILES_DIRS = [BASE_DIR / "static"]  # если будут кастомные файлы темы админки
+
+# Дополнительные настройки whitenoise для продакшена
+if not DEBUG:
+    WHITENOISE_USE_FINDERS = True
+    WHITENOISE_AUTOREFRESH = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -192,7 +203,43 @@ JAZZMIN_SETTINGS = {
         {"name": "Домівка", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "API Health", "url": "/api/health/"},
     ],
+    # Дополнительные настройки для исправления стилей
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "show_full_sidebar": True,
+    "sidebar_collapsed": False,
 }
+
+# Дополнительные настройки для Jazzmin
+JAZZMIN_UI_TWEAKS = [
+    "navbar_small_text",
+    "body_small_text",
+    "brand_small_text",
+    "brand_colour",
+    "accent",
+    "accent_navbar",
+    "navbar",
+    "navbar_nav",
+    "navbar_nav_text",
+    "navbar_nav_small_text",
+    "navbar_nav_font_family",
+    "navbar_nav_font_size",
+    "navbar_nav_font_weight",
+    "navbar_nav_text_transform",
+    "navbar_nav_font_family_base",
+    "navbar_nav_font_size_base",
+    "navbar_nav_font_weight_base",
+    "navbar_nav_text_transform_base",
+    "navbar_nav_font_family_small",
+    "navbar_nav_font_size_small",
+    "navbar_nav_font_weight_small",
+    "navbar_nav_text_transform_small",
+    "navbar_nav_font_family_large",
+    "navbar_nav_font_size_large",
+    "navbar_nav_font_weight_large",
+    "navbar_nav_text_transform_large",
+]
 
 TEMPLATES = [
     {
