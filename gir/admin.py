@@ -1,8 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
-from django.urls import reverse
-from .models import User, FrontendUser
+from django.urls import reverse, path
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from .models import User, FrontendUser, Category, Product, ImportTemplate
+from .forms import ExcelImportForm
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -70,3 +75,124 @@ class FrontendUserAdmin(admin.ModelAdmin):
                 from django.contrib.auth.hashers import make_password
                 obj.password = make_password(obj.password)
         super().save_model(request, obj, form, change)
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug', 'is_active', 'created_at']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['name', 'description']
+    prepopulated_fields = {'slug': ('name',)}
+    ordering = ['name']
+    
+    fieldsets = (
+        ('Основна інформація', {
+            'fields': ('name', 'slug', 'description', 'is_active')
+        }),
+    )
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = [
+        'title', 'category', 'sku', 'cost_price', 'wholesale_price', 
+        'stock_quantity', 'is_active', 'created_at'
+    ]
+    list_filter = ['category', 'is_active', 'created_at', 'updated_at']
+    search_fields = ['title', 'sku']
+    list_editable = ['is_active', 'cost_price', 'wholesale_price', 'stock_quantity']
+    ordering = ['title']
+    
+    fieldsets = (
+        ('Основна інформація', {
+            'fields': ('category', 'title', 'description', 'sku', 'unit', 'is_active')
+        }),
+        ('Ціни та склад', {
+            'fields': ('cost_price', 'wholesale_price', 'stock_quantity')
+        }),
+        ('Характеристики', {
+            'fields': ('modules_count', 'url', 'external_link')
+        }),
+    )
+    prepopulated_fields = {'url': ('title',)}
+    
+    change_list_template = 'admin/product_changelist.html'
+    
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('import-excel/', self.import_excel, name='import_excel'),
+        ]
+        return custom_urls + urls
+    
+    def import_excel(self, request):
+        """Імпорт з Excel файлу"""
+        if request.method == 'POST':
+            form = ExcelImportForm(request.POST, request.FILES)
+            if form.is_valid():
+                try:
+                    # Отримуємо вибраний шаблон
+                    import_template = form.cleaned_data['import_template']
+                    
+                    # Викликаємо команду імпорту
+                    from django.core.management import call_command
+                    from django.core.files.storage import default_storage
+                    from django.core.files.base import ContentFile
+                    
+                    # Зберігаємо файл тимчасово
+                    file_path = default_storage.save(
+                        f'temp_imports/{request.FILES["excel_file"].name}',
+                        ContentFile(request.FILES["excel_file"].read())
+                    )
+                    
+                    # Параметри імпорту з шаблону
+                    process_all = form.cleaned_data['process_all_sheets']
+                    specific_sheets = form.cleaned_data['specific_sheets']
+                    
+                    # Викликаємо команду з параметрами шаблону
+                    call_command('import_products', file=file_path)
+                    
+                    messages.success(request, f'Імпорт успішно завершено за шаблоном "{import_template.name}"!')
+                    
+                    # Видаляємо тимчасовий файл
+                    default_storage.delete(file_path)
+                    
+                    return HttpResponseRedirect(reverse('admin:gir_product_changelist'))
+                    
+                except Exception as e:
+                    messages.error(request, f'Помилка імпорту: {str(e)}')
+        else:
+            form = ExcelImportForm()
+        
+        context = {
+            'title': 'Імпорт товарів з Excel',
+            'form': form,
+            'opts': self.model._meta,
+        }
+        return render(request, 'admin/import_form.html', context)
+
+@admin.register(ImportTemplate)
+class ImportTemplateAdmin(admin.ModelAdmin):
+    list_display = ['name', 'is_active', 'process_all_sheets', 'create_categories', 'created_at']
+    list_filter = ['is_active', 'process_all_sheets', 'create_categories', 'created_at']
+    search_fields = ['name', 'description']
+    
+    fieldsets = (
+        ('Основна інформація', {
+            'fields': ('name', 'description', 'is_active')
+        }),
+        ('Налаштування Excel', {
+            'fields': ('sheet_name', 'process_all_sheets')
+        }),
+        ('Маппінг полів', {
+            'fields': ('field_mapping',),
+            'description': 'JSON з маппінгом полів Excel → Django'
+        }),
+        ('Налаштування обробки', {
+            'fields': ('skip_empty_rows', 'create_categories')
+        }),
+    )
+
+
+
+
+

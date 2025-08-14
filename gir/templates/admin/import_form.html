@@ -1,0 +1,87 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+{{ form.media }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:index' %}">Імпорт</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <fieldset class="module aligned">
+            <h2>Завантаження Excel файлу</h2>
+            
+            {% if form.errors %}
+                <div class="alert alert-error">
+                    <p>Будь ласка, виправте помилки нижче:</p>
+                    {{ form.errors }}
+                </div>
+            {% endif %}
+            
+            <div class="form-row">
+                <div class="field-box">
+                    {{ form.import_template.label_tag }}
+                    {{ form.import_template }}
+                    {% if form.import_template.help_text %}
+                        <div class="help">{{ form.import_template.help_text }}</div>
+                    {% endif %}
+                    {% if form.import_template.errors %}
+                        <div class="errors">{{ form.import_template.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="field-box">
+                    {{ form.excel_file.label_tag }}
+                    {{ form.excel_file }}
+                    {% if form.excel_file.help_text %}
+                        <div class="help">{{ form.excel_file.help_text }}</div>
+                    {% endif %}
+                    {% if form.excel_file.errors %}
+                        <div class="errors">{{ form.excel_file.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="field-box">
+                    {{ form.process_all_sheets.label_tag }}
+                    {{ form.process_all_sheets }}
+                    {% if form.process_all_sheets.help_text %}
+                        <div class="help">{{ form.process_all_sheets.help_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="field-box">
+                    {{ form.specific_sheets.label_tag }}
+                    {{ form.specific_sheets }}
+                    {% if form.specific_sheets.help_text %}
+                        <div class="help">{{ form.specific_sheets.help_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+        
+        <div class="submit-row">
+            <input type="submit" value="Завантажити та імпортувати" class="default" />
+            <a href="{% url 'admin:index' %}" class="button cancel-link">Скасувати</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

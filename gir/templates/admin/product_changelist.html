@@ -1,0 +1,27 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    <li style="list-style: none; margin: 0; padding: 0;">
+        <a href="{% url 'admin:import_excel' %}" 
+           style="
+               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+               color: white;
+               padding: 8px 16px;
+               border-radius: 6px;
+               text-decoration: none;
+               font-weight: 500;
+               box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+               transition: all 0.3s ease;
+               border: none;
+               display: inline-flex;
+               align-items: center;
+               gap: 8px;
+           "
+           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)'"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">
+            📥 Імпорт з Excel
+        </a>
+    </li>
+    {{ block.super }}
+{% endblock %}

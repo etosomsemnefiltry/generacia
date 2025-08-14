@@ -1,0 +1,66 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}Кастомні імпорти | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:index' %}">Імпорт</a>
+&rsaquo; Кастомні імпорти
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module">
+        <h2>Доступні шаблони імпорту</h2>
+        
+        {% if templates %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Назва</th>
+                        <th>Опис</th>
+                        <th>Вкладки</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for template in templates %}
+                    <tr>
+                        <td>{{ template.name }}</td>
+                        <td>{{ template.description|default:"-" }}</td>
+                        <td>
+                            {% if template.process_all_sheets %}
+                                Всі вкладки
+                            {% else %}
+                                {{ template.sheet_name|default:"Не вказано" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'admin:gir_importtemplate_change' template.id %}" class="button">
+                                Редагувати
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Поки що немає доступних шаблонів імпорту.</p>
+        {% endif %}
+        
+        <div class="submit-row">
+            <a href="{% url 'admin:gir_importtemplate_add' %}" class="button default">
+                Додати новий шаблон
+            </a>
+            <a href="{% url 'admin:index' %}" class="button cancel-link">Назад</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

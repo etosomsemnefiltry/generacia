@@ -55,3 +55,96 @@ class FrontendUser(models.Model):
     class Meta:
         verbose_name = "Користувач"
         verbose_name_plural = "Користувачі"
+
+class Category(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Назва")
+    slug = models.SlugField(max_length=255, unique=True, verbose_name="URL")
+    description = models.TextField(blank=True, verbose_name="Опис")
+    is_active = models.BooleanField(default=True, verbose_name="Активна")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата оновлення")
+
+    class Meta:
+        verbose_name = "Категорія"
+        verbose_name_plural = "Категорії"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+class Product(models.Model):
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        verbose_name="Категорія",
+        related_name='products'
+    )
+    title = models.CharField(max_length=500, verbose_name="Найменування")
+    description = models.TextField(verbose_name="Опис", blank=True)
+    unit = models.CharField(max_length=50, verbose_name="Од.вим", blank=True)
+    cost_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Облікова ціна б.г. з ПДВ $",
+        null=True,
+        blank=True
+    )
+    wholesale_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Гуртова ціна з ПДВ, авт% $",
+        null=True,
+        blank=True
+    )
+    sku = models.CharField(max_length=100, verbose_name="Артикул", blank=True)
+    modules_count = models.IntegerField(verbose_name="Кількість модулів", null=True, blank=True)
+    stock_quantity = models.IntegerField(verbose_name="Вільно на складі", default=0)
+    url = models.SlugField(max_length=255, verbose_name="URL товара", blank=True)
+    external_link = models.URLField(verbose_name="Посилання", blank=True)
+    is_active = models.BooleanField(default=True, verbose_name="Активний")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата оновлення")
+
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товари"
+        ordering = ['title']
+        indexes = [
+            models.Index(fields=['title']),
+            models.Index(fields=['sku']),
+            models.Index(fields=['category']),
+        ]
+
+    def __str__(self):
+        return self.title
+
+class ImportTemplate(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Назва імпорту")
+    description = models.TextField(blank=True, verbose_name="Опис")
+    is_active = models.BooleanField(default=True, verbose_name="Активний")
+    
+    # Налаштування Excel
+    sheet_name = models.CharField(max_length=255, verbose_name="Назва вкладки", blank=True)
+    process_all_sheets = models.BooleanField(default=True, verbose_name="Обробити всі вкладки")
+    
+    # Маппінг полів (JSON)
+    field_mapping = models.JSONField(
+        verbose_name="Маппінг полів",
+        default=dict,
+        help_text="JSON з маппінгом полів Excel → Django"
+    )
+    
+    # Налаштування обробки
+    skip_empty_rows = models.BooleanField(default=True, verbose_name="Пропускати порожні рядки")
+    create_categories = models.BooleanField(default=True, verbose_name="Створювати категорії")
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата оновлення")
+
+    class Meta:
+        verbose_name = "Шаблон імпорту"
+        verbose_name_plural = "Шаблони імпорту"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
