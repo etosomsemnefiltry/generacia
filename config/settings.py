@@ -177,7 +177,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-STATICFILES_DIRS = [BASE_DIR / "static"]  # если будут кастомные файлы темы админки
+# Статические файлы - папка опциональна
+STATICFILES_DIRS = []
+if (BASE_DIR / "static").exists():
+    STATICFILES_DIRS.append(BASE_DIR / "static")
 
 # Дополнительные настройки whitenoise для продакшена
 if not DEBUG:
