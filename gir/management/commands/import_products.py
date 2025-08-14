@@ -12,7 +12,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--file',
             type=str,
-            default='FILES/Кошторис Генерація_2.0 (1).xlsx',
+            default='temp_imports/Кошторис Генерація_2.0.xlsx',
             help='Шлях до Excel файлу'
         )
         parser.add_argument(
