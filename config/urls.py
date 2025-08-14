@@ -22,6 +22,7 @@ from core.views import health
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("gir/", include("gir.urls")),
     path("api/health/", health),
-    path("", TemplateView.as_view(template_name="index.html"), name="front"),
+    path("", include("gir.urls")),  # главная страница теперь использует gir.urls
 ]

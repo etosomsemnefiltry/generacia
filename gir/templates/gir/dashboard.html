@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Генерація</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        .welcome-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .user-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">Генерація</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    Вітаємо, {{ frontend_user.first_name|default:frontend_user.username }}!
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="{% url 'frontend_logout' %}">Вийти</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <div class="container">
+        <div class="welcome-card">
+            <div class="user-info">
+                <h2>Ласкаво просимо до системи!</h2>
+                <p class="mb-0">
+                    {% if frontend_user.first_name and frontend_user.last_name %}
+                        {{ frontend_user.first_name }} {{ frontend_user.last_name }}
+                    {% else %}
+                        {{ frontend_user.username }}
+                    {% endif %}
+                    {% if frontend_user.company %}
+                        - {{ frontend_user.company }}
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Інформація про користувача</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Логін:</strong> {{ frontend_user.username }}</li>
+                                <li><strong>Email:</strong> {{ frontend_user.email }}</li>
+                                {% if frontend_user.phone %}
+                                    <li><strong>Телефон:</strong> {{ frontend_user.phone }}</li>
+                                {% endif %}
+                                {% if frontend_user.company %}
+                                    <li><strong>Компанія:</strong> {{ frontend_user.company }}</li>
+                                {% endif %}
+                                <li><strong>Дата реєстрації:</strong> {{ frontend_user.created_at|date:"d.m.Y" }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Швидкі дії</h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" disabled>Створити проект</button>
+                                <button class="btn btn-secondary" disabled>Переглянути звіти</button>
+                                <button class="btn btn-info" disabled>Налаштування</button>
+                            </div>
+                            <small class="text-muted mt-2 d-block">
+                                Функціональність в розробці
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

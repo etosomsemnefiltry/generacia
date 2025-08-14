@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
+    "gir",
 
     # third-party
     "rest_framework",
@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     # local
     "core",
 ]
-
+AUTH_USER_MODEL = "gir.User"
 
 STATIC_BACKEND = env("DJANGO_STATIC_BACKEND")
 if STATIC_BACKEND == "whitenoise":
@@ -209,3 +209,5 @@ TEMPLATES = [
         },
     },
 ]
+
+LOGIN_URL = '/login/'
