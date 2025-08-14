@@ -19,19 +19,19 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
-# Простой подход через DJANGO_DEBUG
-debug_value = os.environ.get('DJANGO_DEBUG')
-if debug_value and debug_value.lower() in ('1', 'true', 'yes', 'on'):
-    DEBUG = True
-else:
-    DEBUG = False
+# Простой подход через ISPROD
+is_prod = os.environ.get('ISPROD', '0') == '1'
 
-if DEBUG:
-    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-    SECRET_KEY = "dev-secret-key-change-in-production"
-else:
+if is_prod:
+    # Продакшен режим
+    DEBUG = False
     ALLOWED_HOSTS = ['gir.generacia.energy']
     SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-in-production')
+else:
+    # Локальная разработка
+    DEBUG = True
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+    SECRET_KEY = "dev-secret-key-change-in-production"
 
 # DB
 DATABASES = {
@@ -63,19 +63,9 @@ INSTALLED_APPS = [
 ]
 AUTH_USER_MODEL = "gir.User"
 
-# Простой подход через DEBUG
-if DEBUG:
-    MIDDLEWARE = [
-        "corsheaders.middleware.CorsMiddleware",
-        "django.middleware.security.SecurityMiddleware",
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.common.CommonMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.messages.middleware.MessageMiddleware",
-        "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    ]
-else:
+# Простой подход через ISPROD
+if is_prod:
+    # Продакшен - используем whitenoise
     MIDDLEWARE = [
         "corsheaders.middleware.CorsMiddleware",
         "django.middleware.security.SecurityMiddleware",
@@ -88,6 +78,18 @@ else:
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
     STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+else:
+    # Локальная разработка - Django сам раздает статику
+    MIDDLEWARE = [
+        "corsheaders.middleware.CorsMiddleware",
+        "django.middleware.security.SecurityMiddleware",
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    ]
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
@@ -112,12 +114,12 @@ SIMPLE_JWT = {
 }
 
 # CORS/CSRF настройки
-if DEBUG:
-    CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
-    CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
-else:
+if is_prod:
     CORS_ALLOWED_ORIGINS = ['https://gir.generacia.energy']
     CSRF_TRUSTED_ORIGINS = ['https://gir.generacia.energy']
+else:
+    CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
+    CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
@@ -183,7 +185,7 @@ if (BASE_DIR / "static").exists():
     STATICFILES_DIRS.append(BASE_DIR / "static")
 
 # Дополнительные настройки whitenoise для продакшена
-if not DEBUG:
+if is_prod:
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True
 
@@ -201,48 +203,14 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     "hide_apps": [],
     "copyright": "Генерація",
-    "site_logo": None,  # можно подключить PNG из STATIC, когда будет
+    "site_logo": None,
     "topmenu_links": [
         {"name": "Домівка", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "API Health", "url": "/api/health/"},
     ],
-    # Дополнительные настройки для исправления стилей
-    "use_google_fonts_cdn": True,
-    "show_ui_builder": False,
-    "changeform_format": "horizontal_tabs",
-    "show_full_sidebar": True,
-    "sidebar_collapsed": False,
 }
 
-# Дополнительные настройки для Jazzmin
-JAZZMIN_UI_TWEAKS = [
-    "navbar_small_text",
-    "body_small_text",
-    "brand_small_text",
-    "brand_colour",
-    "accent",
-    "accent_navbar",
-    "navbar",
-    "navbar_nav",
-    "navbar_nav_text",
-    "navbar_nav_small_text",
-    "navbar_nav_font_family",
-    "navbar_nav_font_size",
-    "navbar_nav_font_weight",
-    "navbar_nav_text_transform",
-    "navbar_nav_font_family_base",
-    "navbar_nav_font_size_base",
-    "navbar_nav_font_weight_base",
-    "navbar_nav_text_transform_base",
-    "navbar_nav_font_family_small",
-    "navbar_nav_font_size_small",
-    "navbar_nav_font_weight_small",
-    "navbar_nav_text_transform_small",
-    "navbar_nav_font_family_large",
-    "navbar_nav_font_size_large",
-    "navbar_nav_font_weight_large",
-    "navbar_nav_text_transform_large",
-]
+# Убираем JAZZMIN_UI_TWEAKS - он не нужен и вызывает ошибки
 
 TEMPLATES = [
     {
