@@ -8,8 +8,10 @@ import string
 class User(AbstractUser):
     # Только для входа в админ панель Django
     # Наследуем все стандартные поля Django
-    pass
-
+    
+    # Добавляем поле phone как необязательное для совместимости
+    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Телефон")
+    
     def __str__(self):
         return f"{self.username} (адмін)"
 
