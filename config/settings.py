@@ -24,7 +24,7 @@ is_prod = os.environ.get('ISPROD', '0') == '1'
 
 if is_prod:
     # Продакшен режим
-    DEBUG = False
+    DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() == 'true'  # Можно переопределить через DJANGO_DEBUG=1
     ALLOWED_HOSTS = ['gir.generacia.energy']
     SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-in-production')
 else:
@@ -211,6 +211,70 @@ JAZZMIN_SETTINGS = {
 }
 
 # Убираем JAZZMIN_UI_TWEAKS - он не нужен и вызывает ошибки
+
+# Настройки логирования для продакшена
+if is_prod:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'style': '{',
+            },
+            'simple': {
+                'format': '{levelname} {message}',
+                'style': '{',
+            },
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'verbose',
+            },
+            'file': {
+                'class': 'logging.FileHandler',
+                'filename': '/tmp/django.log',
+                'formatter': 'verbose',
+            },
+        },
+        'root': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'django.request': {
+                'handlers': ['console', 'file'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
+            'gir': {
+                'handlers': ['console', 'file'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
+        },
+    }
+else:
+    # Локальная разработка - простые логи
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    }
 
 TEMPLATES = [
     {
