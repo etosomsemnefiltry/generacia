@@ -25,7 +25,7 @@ is_prod = os.environ.get('ISPROD', '0') == '1'
 if is_prod:
     # Продакшен режим
     DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() == 'true'  # Можно переопределить через DJANGO_DEBUG=1
-    ALLOWED_HOSTS = ['gir.generacia.energy']
+    ALLOWED_HOSTS = ['gir.generacia.energy', 'generacia.onrender.com']
     SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-in-production')
 else:
     # Локальная разработка
@@ -115,8 +115,8 @@ SIMPLE_JWT = {
 
 # CORS/CSRF настройки
 if is_prod:
-    CORS_ALLOWED_ORIGINS = ['https://gir.generacia.energy']
-    CSRF_TRUSTED_ORIGINS = ['https://gir.generacia.energy']
+    CORS_ALLOWED_ORIGINS = ['https://gir.generacia.energy', 'https://generacia.onrender.com']
+    CSRF_TRUSTED_ORIGINS = ['https://gir.generacia.energy', 'https://generacia.onrender.com']
 else:
     CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
     CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
