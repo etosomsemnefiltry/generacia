@@ -6,8 +6,10 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-      python manage.py migrate
-    startCommand: gunicorn config.wsgi:application --workers=3 --timeout=120
+    startCommand: |
+      python manage.py migrate --noinput && \
+      python manage.py check --deploy && \
+      gunicorn config.wsgi:application --workers=3 --timeout=120 --log-level debug --access-logfile - --error-logfile -
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings
