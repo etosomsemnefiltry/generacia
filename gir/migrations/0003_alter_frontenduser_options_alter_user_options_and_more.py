@@ -11,10 +11,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name='frontenduser',
-            options={'verbose_name': 'Покупець', 'verbose_name_plural': 'Покупці'},
-        ),
-        migrations.AlterModelOptions(
             name='user',
             options={'verbose_name': 'Адміністратор', 'verbose_name_plural': 'Адміністратори'},
         ),

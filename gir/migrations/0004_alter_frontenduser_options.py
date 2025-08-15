@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='frontenduser',
-            options={'verbose_name': 'Користувач', 'verbose_name_plural': 'Користувачі'},
+        migrations.RunSQL(
+            sql="COMMENT ON TABLE gir_frontenduser IS 'Користувач';",
+            reverse_sql="COMMENT ON TABLE gir_frontenduser IS NULL;"
         ),
     ]
