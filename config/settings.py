@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     # third-party
     "rest_framework",
     "corsheaders",
+    "django_safemigrate",  # безопасные миграции
 
     # local
     "core",
@@ -298,3 +299,6 @@ TEMPLATES = [
 ]
 
 LOGIN_URL = '/login/'
+
+# Настройки django-safemigrate
+SAFEMIGRATE = 'nonstrict'  # 'strict', 'nonstrict', или 'disabled'

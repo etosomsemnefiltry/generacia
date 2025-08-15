@@ -18,9 +18,9 @@ class Migration(migrations.Migration):
             name='user',
             options={'verbose_name': 'Адміністратор', 'verbose_name_plural': 'Адміністратори'},
         ),
-        migrations.RunSQL(
-            sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS user_id;",
-            reverse_sql="ALTER TABLE gir_frontenduser ADD COLUMN user_id INTEGER REFERENCES gir_user(id);"
+        migrations.RemoveField(
+            model_name='frontenduser',
+            name='user',
         ),
         migrations.AddField(
             model_name='frontenduser',

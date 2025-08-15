@@ -10,8 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            sql="ALTER TABLE gir_product ALTER COLUMN url TYPE VARCHAR(255);",
-            reverse_sql="ALTER TABLE gir_product ALTER COLUMN url TYPE VARCHAR(255);"
+        migrations.AlterField(
+            model_name='product',
+            name='url',
+            field=models.SlugField(blank=True, max_length=255, verbose_name='URL товара'),
         ),
     ]
