@@ -10,9 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='product',
-            name='external_link',
-            field=models.CharField(blank=True, max_length=500, verbose_name='Посилання'),
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_product ALTER COLUMN external_link TYPE VARCHAR(500);",
+            reverse_sql="ALTER TABLE gir_product ALTER COLUMN external_link TYPE VARCHAR(500);"
         ),
     ]

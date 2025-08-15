@@ -18,9 +18,9 @@ class Migration(migrations.Migration):
             name='user',
             options={'verbose_name': 'Адміністратор', 'verbose_name_plural': 'Адміністратори'},
         ),
-        migrations.RemoveField(
-            model_name='frontenduser',
-            name='user',
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS user_id;",
+            reverse_sql="ALTER TABLE gir_frontenduser ADD COLUMN user_id INTEGER REFERENCES gir_user(id);"
         ),
         migrations.AddField(
             model_name='frontenduser',
@@ -54,9 +54,8 @@ class Migration(migrations.Migration):
             field=models.CharField(default='ChangeMe123!', max_length=150, unique=True, verbose_name='Логін'),
             preserve_default=False,
         ),
-        migrations.AlterField(
-            model_name='frontenduser',
-            name='photo',
-            field=models.ImageField(blank=True, null=True, upload_to='frontend_user_photos/', verbose_name='Фото'),
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser ALTER COLUMN photo TYPE VARCHAR(100);",
+            reverse_sql="ALTER TABLE gir_frontenduser ALTER COLUMN photo TYPE VARCHAR(100);"
         ),
     ]
