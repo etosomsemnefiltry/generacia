@@ -302,3 +302,4 @@ LOGIN_URL = '/login/'
 
 # Настройки django-safemigrate
 SAFEMIGRATE = 'nonstrict'  # 'strict', 'nonstrict', или 'disabled'
+SAFEMIGRATE_AUTO_INTERCEPT = True  # автоматически перехватывает команду migrate
