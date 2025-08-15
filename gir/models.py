@@ -150,3 +150,73 @@ class ImportTemplate(models.Model):
 
     def __str__(self):
         return self.name
+
+class SettingGroup(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Назва групи")
+    description = models.TextField(blank=True, verbose_name="Опис")
+    is_active = models.BooleanField(default=True, verbose_name="Активна")
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата оновлення")
+
+    class Meta:
+        verbose_name = "Група налаштувань"
+        verbose_name_plural = "Групи налаштувань"
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
+
+class Setting(models.Model):
+    SETTING_TYPES = [
+        ('single', 'Одиночне значення'),
+        ('list', 'Список значень'),
+    ]
+    
+    group = models.ForeignKey(
+        SettingGroup, 
+        on_delete=models.CASCADE, 
+        verbose_name="Група",
+        related_name='settings'
+    )
+    name = models.CharField(max_length=255, verbose_name="Назва налаштування")
+    key = models.CharField(max_length=255, unique=True, verbose_name="Ключ")
+    setting_type = models.CharField(
+        max_length=20, 
+        choices=SETTING_TYPES, 
+        verbose_name="Тип налаштування"
+    )
+    value = models.TextField(blank=True, verbose_name="Значення")
+    description = models.TextField(blank=True, verbose_name="Опис")
+    is_active = models.BooleanField(default=True, verbose_name="Активне")
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата оновлення")
+
+    class Meta:
+        verbose_name = "Налаштування"
+        verbose_name_plural = "Налаштування"
+        ordering = ['group', 'order', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.group.name})"
+
+class SettingValue(models.Model):
+    setting = models.ForeignKey(
+        Setting, 
+        on_delete=models.CASCADE, 
+        verbose_name="Налаштування",
+        related_name='values'
+    )
+    value = models.CharField(max_length=500, verbose_name="Значення")
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    is_active = models.BooleanField(default=True, verbose_name="Активне")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
+
+    class Meta:
+        verbose_name = "Значення налаштування"
+        verbose_name_plural = "Значення налаштувань"
+        ordering = ['setting', 'order', 'value']
+
+    def __str__(self):
+        return f"{self.value} ({self.setting.name})"

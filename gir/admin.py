@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from .models import User, FrontendUser, Category, Product, ImportTemplate
+from .models import User, FrontendUser, Category, Product, ImportTemplate, SettingGroup, Setting, SettingValue
 from .forms import ExcelImportForm
 
 @admin.register(User)
@@ -192,6 +192,27 @@ class ImportTemplateAdmin(admin.ModelAdmin):
             'fields': ('skip_empty_rows', 'create_categories')
         }),
     )
+
+# Кастомна сторінка налаштувань
+class SettingsAdmin(admin.ModelAdmin):
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('', self.settings_index, name='settings_index'),
+        ]
+        return custom_urls + urls
+
+    def settings_index(self, request):
+        groups = SettingGroup.objects.filter(is_active=True).order_by('order', 'name')
+        context = {
+            'title': 'Налаштування',
+            'groups': groups,
+            'opts': SettingGroup._meta,
+        }
+        return render(request, 'admin/settings_index.html', context)
+
+# Додаємо кастомну сторінку налаштувань для SettingGroup в основний адмін сайт
+admin.site.register(SettingGroup, SettingsAdmin)
 
 
 

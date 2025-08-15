@@ -27,7 +27,7 @@ urlpatterns = [
     path("gir/", include("gir.urls")),
     path("api/health/", health),
     path("api/migrations/", migrations_status),
-    path("", include("gir.urls")),  # главная страница теперь использует gir.urls
+    path("", include("gir.urls")),  # головна сторінка тепер використовує gir.urls
 ]
 
 # Добавляем обработку статических файлов в режиме разработки
