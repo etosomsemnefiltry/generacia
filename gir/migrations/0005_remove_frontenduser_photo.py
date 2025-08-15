@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS photo;",
-            reverse_sql="ALTER TABLE gir_frontenduser ADD COLUMN photo VARCHAR(100);"
+        migrations.RemoveField(
+            model_name='frontenduser',
+            name='photo',
         ),
     ]

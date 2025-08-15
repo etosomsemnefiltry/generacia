@@ -35,18 +35,20 @@ class Migration(migrations.Migration):
             name='last_name',
             field=models.CharField(blank=True, max_length=150, verbose_name='last name'),
         ),
-        migrations.RunSQL(
-            sql="""
-            CREATE TABLE IF NOT EXISTS gir_frontenduser (
-                id BIGSERIAL PRIMARY KEY,
-                company VARCHAR(200),
-                phone VARCHAR(20),
-                photo VARCHAR(100),
-                created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-                updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
-                user_id INTEGER NOT NULL UNIQUE REFERENCES gir_user(id) DEFERRABLE INITIALLY DEFERRED
-            );
-            """,
-            reverse_sql="DROP TABLE IF EXISTS gir_frontenduser;"
+        migrations.CreateModel(
+            name='FrontendUser',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('company', models.CharField(blank=True, max_length=200, null=True, verbose_name='Компанія')),
+                ('phone', models.CharField(blank=True, max_length=20, verbose_name='Телефон')),
+                ('photo', models.ImageField(blank=True, null=True, upload_to='frontend_user_photos/', verbose_name='Фото')),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Дата створення')),
+                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Дата оновлення')),
+                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Користувач Django')),
+            ],
+            options={
+                'verbose_name': 'Користувач фронтенду',
+                'verbose_name_plural': 'Користувачі фронтенду',
+            },
         ),
     ]
