@@ -188,6 +188,11 @@ if (BASE_DIR / "static").exists():
 if is_prod:
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True
+    
+    # Настройки для медиа файлов в продакшене
+    # Используем whitenoise для раздачи медиа файлов
+    WHITENOISE_ROOT = BASE_DIR / "media"
+    WHITENOISE_INDEX_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

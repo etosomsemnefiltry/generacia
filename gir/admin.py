@@ -133,28 +133,29 @@ class ProductAdmin(admin.ModelAdmin):
                     # Отримуємо вибраний шаблон
                     import_template = form.cleaned_data['import_template']
                     
-                    # Викликаємо команду імпорту
-                    from django.core.management import call_command
-                    from django.core.files.storage import default_storage
-                    from django.core.files.base import ContentFile
+                    # Отримуємо файл
+                    excel_file = request.FILES["excel_file"]
                     
-                    # Зберігаємо файл тимчасово
-                    file_path = default_storage.save(
-                        f'temp_imports/{request.FILES["excel_file"].name}',
-                        ContentFile(request.FILES["excel_file"].read())
-                    )
-                    
-                    # Параметри імпорту з шаблону
+                    # Параметри імпорту з форми
                     process_all = form.cleaned_data['process_all_sheets']
                     specific_sheets = form.cleaned_data['specific_sheets']
                     
-                    # Викликаємо команду з параметрами шаблону
-                    call_command('import_products', file=file_path)
+                    # Викликаємо команду з файлом в пам'яті
+                    from django.core.management import call_command
+                    from io import BytesIO
+                    
+                    # Створюємо тимчасовий файл в пам'яті
+                    temp_file = BytesIO(excel_file.read())
+                    temp_file.name = excel_file.name
+                    
+                    # Викликаємо команду з тимчасовим файлом
+                    if specific_sheets and specific_sheets.strip():
+                        sheets_list = [s.strip() for s in specific_sheets.split(',')]
+                        call_command('import_products', file=temp_file, sheets=sheets_list)
+                    else:
+                        call_command('import_products', file=temp_file)
                     
                     messages.success(request, f'Імпорт успішно завершено за шаблоном "{import_template.name}"!')
-                    
-                    # Видаляємо тимчасовий файл
-                    default_storage.delete(file_path)
                     
                     return HttpResponseRedirect(reverse('admin:gir_product_changelist'))
                     

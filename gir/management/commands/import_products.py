@@ -26,16 +26,24 @@ class Command(BaseCommand):
         file_path = options['file']
         specific_sheets = options['sheets']
         
-        if not os.path.exists(file_path):
-            self.stdout.write(
-                self.style.ERROR(f'Файл не знайдено: {file_path}')
-            )
-            return
+        # Перевіряємо чи це файл в пам'яті (BytesIO) або шлях до файлу
+        if hasattr(file_path, 'read'):
+            # Це файл в пам'яті
+            excel_file = file_path
+            self.stdout.write(f'Завантажую файл з пам\'яті: {excel_file.name}')
+        else:
+            # Це шлях до файлу
+            if not os.path.exists(file_path):
+                self.stdout.write(
+                    self.style.ERROR(f'Файл не знайдено: {file_path}')
+                )
+                return
+            excel_file = file_path
+            self.stdout.write(f'Завантажую файл: {file_path}')
         
         try:
             # Завантажуємо Excel
-            self.stdout.write(f'Завантажую файл: {file_path}')
-            workbook = load_workbook(file_path, data_only=True)
+            workbook = load_workbook(excel_file, data_only=True)
             
             # Визначаємо які вкладки обробляти
             if specific_sheets:
