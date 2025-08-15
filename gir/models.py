@@ -102,7 +102,7 @@ class Product(models.Model):
     modules_count = models.IntegerField(verbose_name="Кількість модулів", null=True, blank=True)
     stock_quantity = models.IntegerField(verbose_name="Вільно на складі", default=0)
     url = models.SlugField(max_length=500, verbose_name="URL товара", blank=True)
-    external_link = models.URLField(verbose_name="Посилання", blank=True)
+    external_link = models.CharField(max_length=500, verbose_name="Посилання", blank=True)
     is_active = models.BooleanField(default=True, verbose_name="Активний")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата оновлення")
