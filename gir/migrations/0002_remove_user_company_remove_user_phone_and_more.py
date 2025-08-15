@@ -12,13 +12,13 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='user',
-            name='company',
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_user DROP COLUMN IF EXISTS company;",
+            reverse_sql="ALTER TABLE gir_user ADD COLUMN company VARCHAR(200);"
         ),
-        migrations.RemoveField(
-            model_name='user',
-            name='phone',
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_user DROP COLUMN IF EXISTS phone;",
+            reverse_sql="ALTER TABLE gir_user ADD COLUMN phone VARCHAR(20);"
         ),
         migrations.AlterField(
             model_name='user',
