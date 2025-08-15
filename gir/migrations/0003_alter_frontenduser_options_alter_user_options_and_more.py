@@ -10,49 +10,44 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='user',
-            options={'verbose_name': 'Адміністратор', 'verbose_name_plural': 'Адміністратори'},
+        migrations.RunSQL(
+            sql="COMMENT ON TABLE gir_user IS 'Адміністратор';",
+            reverse_sql="COMMENT ON TABLE gir_user IS NULL;"
         ),
-        migrations.RemoveField(
-            model_name='frontenduser',
-            name='user',
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS user_id;",
+            reverse_sql="ALTER TABLE gir_frontenduser ADD COLUMN user_id INTEGER REFERENCES gir_user(id);"
         ),
-        migrations.AddField(
-            model_name='frontenduser',
-            name='email',
-            field=models.EmailField(blank=True, max_length=254, null=True, unique=True, verbose_name='Email'),
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser ADD COLUMN IF NOT EXISTS email VARCHAR(254);",
+            reverse_sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS email;"
         ),
-        migrations.AddField(
-            model_name='frontenduser',
-            name='first_name',
-            field=models.CharField(blank=True, max_length=200, verbose_name="Ім'я"),
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser ADD COLUMN IF NOT EXISTS first_name VARCHAR(200);",
+            reverse_sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS first_name;"
         ),
-        migrations.AddField(
-            model_name='frontenduser',
-            name='is_active',
-            field=models.BooleanField(default=True, verbose_name='Активний'),
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;",
+            reverse_sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS is_active;"
         ),
-        migrations.AddField(
-            model_name='frontenduser',
-            name='last_name',
-            field=models.CharField(blank=True, max_length=200, verbose_name='Прізвище'),
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser ADD COLUMN IF NOT EXISTS last_name VARCHAR(200);",
+            reverse_sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS last_name;"
         ),
-        migrations.AddField(
-            model_name='frontenduser',
-            name='password',
-            field=models.CharField(default='ChangeMe123!', max_length=128, verbose_name='Пароль'),
-            preserve_default=False,
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser ADD COLUMN IF NOT EXISTS password VARCHAR(128) DEFAULT 'ChangeMe123!';",
+            reverse_sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS password;"
         ),
-        migrations.AddField(
-            model_name='frontenduser',
-            name='username',
-            field=models.CharField(default='ChangeMe123!', max_length=150, unique=True, verbose_name='Логін'),
-            preserve_default=False,
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser ADD COLUMN IF NOT EXISTS username VARCHAR(150) DEFAULT 'ChangeMe123!' UNIQUE;",
+            reverse_sql="ALTER TABLE gir_frontenduser DROP COLUMN IF EXISTS username;"
         ),
-        migrations.AlterField(
-            model_name='frontenduser',
-            name='photo',
-            field=models.ImageField(blank=True, null=True, upload_to='frontend_user_photos/', verbose_name='Фото'),
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser ADD CONSTRAINT IF NOT EXISTS gir_frontenduser_email_unique UNIQUE (email);",
+            reverse_sql="ALTER TABLE gir_frontenduser DROP CONSTRAINT IF EXISTS gir_frontenduser_email_unique;"
+        ),
+        migrations.RunSQL(
+            sql="ALTER TABLE gir_frontenduser ALTER COLUMN photo TYPE VARCHAR(100);",
+            reverse_sql="ALTER TABLE gir_frontenduser ALTER COLUMN photo TYPE VARCHAR(100);"
         ),
     ]
