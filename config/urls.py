@@ -20,12 +20,13 @@ from django.urls import path, include
 from django.views.generic import TemplateView 
 from django.conf import settings
 from django.conf.urls.static import static
-from core.views import health
+from core.views import health, migrations_status
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("gir/", include("gir.urls")),
     path("api/health/", health),
+    path("api/migrations/", migrations_status),
     path("", include("gir.urls")),  # главная страница теперь использует gir.urls
 ]
 
