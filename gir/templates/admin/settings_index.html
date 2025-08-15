@@ -3,66 +3,109 @@
 
 {% block title %}Налаштування{% endblock %}
 
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/fontawesome-free/css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'gir/css/settings.css' %}">
+{% endblock %}
+
 {% block content %}
-<div id="content-main">
-    <div class="module-header">
-        <h1>Налаштування</h1>
-        
-        <div class="object-tools">
-            <ul>
-                <li>
-                    <a href="{% url 'admin:gir_settinggroup_add' %}" class="addlink">
-                        Додати групу
-                    </a>
-                </li>
-            </ul>
+<div class="container-fluid">
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="alert alert-success success-message" role="alert">
+                    <i class="fa fa-check-circle" data-fallback="✓"></i>
+                    {{ message|safe }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="settings-title">Налаштування</h1>
+                
+                <a href="{% url 'admin:gir_settinggroup_add' %}" class="btn btn-primary btn-lg add-group-btn">
+                    <i class="fa fa-plus" data-fallback="+"></i>
+                    Додати групу
+                </a>
+            </div>
         </div>
     </div>
     
-    <div class="module">
-        <div class="description">
-            <p>Тут ви можете керувати групами налаштувань. Кожна група може містити кілька налаштувань.</p>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card settings-description">
+                <div class="card-body">
+                    <p class="mb-0">Тут ви можете керувати групами налаштувань. Кожна група може містити кілька налаштувань.</p>
+                </div>
+            </div>
         </div>
-        
-        {% if groups %}
-            <div class="results">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Назва</th>
-                            <th>Опис</th>
-                            <th>Порядок</th>
-                            <th>Статус</th>
-                            <th>Дії</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for group in groups %}
-                        <tr>
-                            <td><strong>{{ group.name }}</strong></td>
-                            <td>{{ group.description|default:"—" }}</td>
-                            <td>{{ group.order }}</td>
-                            <td>
-                                {% if group.is_active %}
-                                    <span class="status-active">Активна</span>
-                                {% else %}
-                                    <span class="status-inactive">Неактивна</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <a href="{% url 'admin:gir_settinggroup_change' group.id %}" class="button">Редагувати</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="empty-list">
-                <p>Груп налаштувань ще не створено.</p>
-                <p><a href="{% url 'admin:gir_settinggroup_add' %}" class="button">Створити першу групу</a></p>
-            </div>
-        {% endif %}
     </div>
+    
+    {% if groups %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card settings-table">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Назва</th>
+                                        <th>Опис</th>
+                                        <th>Порядок</th>
+                                        <th>Статус</th>
+                                        <th>Дії</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for group in groups %}
+                                    <tr>
+                                        <td class="group-name">{{ group.name }}</td>
+                                        <td class="group-description">{{ group.description|default:"—" }}</td>
+                                        <td class="text-center">
+                                            <span class="group-order">{{ group.order }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if group.is_active %}
+                                                <span class="status-active">Активна</span>
+                                            {% else %}
+                                                <span class="status-inactive">Неактивна</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{% url 'admin:gir_settinggroup_change' group.id %}" class="btn btn-success btn-sm edit-btn">
+                                                <i class="fa fa-pencil" data-fallback="✏️"></i>
+                                                Редагувати
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card empty-state">
+                    <div class="card-body text-center py-5">
+                        <h3 class="mb-3">Груп налаштувань ще не створено</h3>
+                        <p class="mb-4">Почніть з створення першої групи налаштувань для вашого проекту</p>
+                        <a href="{% url 'admin:gir_settinggroup_add' %}" class="btn btn-primary btn-lg create-first-btn">
+                            <i class="fa fa-plus" data-fallback="+"></i>
+                            Створити першу групу
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

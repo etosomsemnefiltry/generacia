@@ -1,0 +1,201 @@
+/* Дополнительные стили для страницы настроек с использованием Bootstrap */
+
+/* Кастомные стили для таблицы */
+.settings-table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.settings-table .table {
+    margin-bottom: 0;
+}
+
+.settings-table .table thead th {
+    background: #007bff;
+    color: white;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 15px 20px;
+}
+
+.settings-table .table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.settings-table .table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.005);
+}
+
+.settings-table .table td {
+    padding: 15px 20px;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Стили для статусов */
+.status-active {
+    background: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-inactive {
+    background: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Стили для порядка */
+.group-order {
+    background: #6c757d;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 40px;
+    display: inline-block;
+}
+
+/* Стили для названия группы */
+.group-name {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Стили для описания */
+.group-description {
+    color: #6c757d;
+    max-width: 300px;
+    line-height: 1.4;
+}
+
+/* Кастомные стили для кнопок */
+.add-group-btn {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.add-group-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.edit-btn {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    border: none;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+/* Стили для заголовка */
+.settings-title {
+    color: #495057;
+    font-weight: 700;
+}
+
+/* Стили для описания */
+.settings-description {
+    background: #f8f9fa;
+    border-left: 4px solid #007bff;
+}
+
+/* Стили для сообщения об успехе */
+.success-message {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.success-message .highlight {
+    color: #007bff;
+    font-weight: 600;
+}
+
+/* Стили для пустого состояния */
+.empty-state {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+}
+
+.empty-state h3 {
+    color: #6c757d;
+}
+
+.empty-state p {
+    color: #adb5bd;
+}
+
+.create-first-btn {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.create-first-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+/* Fallback стили для случаев, когда Font Awesome не загрузится */
+.fa:before {
+    content: attr(data-fallback);
+}
+
+.fa-plus:before {
+    content: "+";
+}
+
+.fa-pencil:before {
+    content: "✏️";
+}
+
+.fa-check-circle:before {
+    content: "✓";
+}
+
+/* Дополнительные стили для улучшения внешнего вида */
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa !important;
+}
+
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.btn-lg {
+    padding: 12px 24px;
+    font-size: 16px;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 13px;
+}
